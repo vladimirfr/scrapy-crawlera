@@ -16,6 +16,7 @@ class CrawleraMiddleware(object):
     url = 'http://proxy.crawlera.com:8010'
     maxbans = 400
     ban_code = 503
+    limit_code = 400
     download_timeout = 190
     # Handle crawlera server failures
     connection_refused_delay = 90
@@ -135,7 +136,9 @@ class CrawleraMiddleware(object):
             return response
         key = self._get_slot_key(request)
         self._restore_original_delay(request)
-        if response.status == self.ban_code:
+        if response.status == self.limit_code:
+        	self._proxyauth = self.get_proxyauth(spider)
+        if response.status == self.ban_code or response.status == self.limit_code:
             self._bans[key] += 1
             if self._bans[key] > self.maxbans:
                 self.crawler.engine.close_spider(spider, 'banned')
