@@ -139,7 +139,8 @@ class CrawleraMiddleware(object):
         if response.status == self.limit_code:
         	self._proxyauth = self.get_proxyauth(spider)
         if response.status == self.ban_code or response.status == self.limit_code:
-            self._bans[key] += 1
+            if response.status == self.ban_code :
+                self._bans[key] += 1
             if self._bans[key] > self.maxbans:
                 self.crawler.engine.close_spider(spider, 'banned')
             else:
